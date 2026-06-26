@@ -1,66 +1,919 @@
-const SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Registration — Green Ridge District Fellowship 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-const formData = new FormData(document.getElementById('registrationForm'));
-const ref = 'GRD-' + new Date().getFullYear() + '-' +
-            Math.random().toString(36).substring(2,7).toUpperCase();
+  :root {
+    --navy: #1F3864;
+    --navy-mid: #2F5496;
+    --navy-light: #D6E4F7;
+    --gold: #C9972C;
+    --gold-light: #FEF3DC;
+    --green: #2E7D55;
+    --green-light: #E6F4EC;
+    --text: #1a1a2e;
+    --text-muted: #4a5568;
+    --text-hint: #718096;
+    --border: #CBD5E0;
+    --border-focus: #2F5496;
+    --bg: #F7F9FC;
+    --surface: #ffffff;
+    --error: #C53030;
+    --error-bg: #FFF5F5;
+    --success: #276749;
+    --success-bg: #F0FFF4;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
 
-const adults = [];
-document.querySelectorAll('[name^="adult_first_"]').forEach((el, i) => {
-  const n = i + 1;
-  const first = el.value.trim();
-  const last = document.querySelector(`[name="adult_last_${n}"]`)?.value.trim();
-  const phone = document.querySelector(`[name="adult_phone_${n}"]`)?.value.trim();
-  const rel = document.querySelector(`[name="adult_rel_${n}"]`)?.value.trim();
-  if (first) adults.push(`${first} ${last} (${rel}) - ${phone}`);
-});
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
 
-const children = [];
-document.querySelectorAll('[name^="child_first_"]').forEach((el, i) => {
-  const n = i + 1;
-  const first = el.value.trim();
-  const last = document.querySelector(`[name="child_last_${n}"]`)?.value.trim();
-  const age = document.querySelector(`[name="child_age_${n}"]`)?.value.trim();
-  const school = document.querySelector(`[name="child_school_${n}"]`)?.value.trim();
-  if (first) children.push(`${first} ${last}, Age ${age}, ${school}`);
-});
+  /* Header */
+  .site-header {
+    background: var(--navy);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-accent {
+    position: absolute;
+    top: 0; right: 0;
+    width: 220px; height: 100%;
+    background: var(--gold);
+    opacity: 0.08;
+    clip-path: polygon(40% 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  .header-emblem {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .header-emblem svg { width: 28px; height: 28px; }
+  .header-text h1 {
+    font-family: 'Lora', serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .header-text p {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 0.35rem;
+    line-height: 1.5;
+  }
+  .header-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 0.5rem;
+  }
 
-const payload = {
-  timestamp: new Date().toLocaleString('en-KE'),
-  ref,
-  hof_first:     formData.get('hof_first'),
-  hof_last:      formData.get('hof_last'),
-  hof_role:      formData.get('hof_role'),
-  phone_primary: formData.get('phone_primary'),
-  phone_alt:     formData.get('phone_alt'),
-  email_primary: formData.get('email_primary'),
-  addr_estate:   formData.get('addr_estate'),
-  addr_road:     formData.get('addr_road'),
-  addr_town:     formData.get('addr_town'),
-  addr_county:   formData.get('addr_county'),
-  addr_postcode: formData.get('addr_postcode'),
-  addr_landmark: formData.get('addr_landmark'),
-  spouse:        `${formData.get('sp_first')} ${formData.get('sp_last')}`.trim(),
-  spouse_phone:  formData.get('sp_phone'),
-  other_adults:  adults.join(' | '),
-  children:      children.join(' | '),
-  notes:         formData.get('notes')
-};
+  /* Progress bar */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.12);
+    height: 3px;
+  }
+  .progress-bar-fill {
+    height: 3px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
 
-fetch(SCRIPT_URL, {
-  method: 'POST',
-  body: JSON.stringify(payload)
-})
-.then(() => {
-  document.getElementById('refCode').textContent = 'Reference: ' + ref;
-  document.getElementById('registrationForm').style.display = 'none';
-  document.querySelector('.notice').style.display = 'none';
-  document.getElementById('successScreen').classList.add('show');
-  document.getElementById('progressBar').style.width = '100%';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-})
-.catch(() => {
-  btn.disabled = false;
-  text.textContent = 'Submit family registration';
-  spinner.style.display = 'none';
-  alert('Submission failed. Please check your connection and try again.');
-});
+  /* Main */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  /* Notice */
+  .notice {
+    background: var(--navy-light);
+    border-left: 3px solid var(--navy-mid);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: var(--navy);
+    margin-bottom: 1.75rem;
+    line-height: 1.5;
+  }
+
+  /* Sections */
+  .form-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.5rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid #EDF2F7;
+  }
+  .section-icon {
+    width: 34px; height: 34px;
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-icon.navy { background: var(--navy-light); }
+  .section-icon.gold { background: var(--gold-light); }
+  .section-icon.green { background: var(--green-light); }
+  .section-icon svg { width: 18px; height: 18px; }
+  .section-icon.navy svg { stroke: var(--navy); }
+  .section-icon.gold svg { stroke: var(--gold); }
+  .section-icon.green svg { stroke: var(--green); }
+
+  .section-header h2 {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .section-header p {
+    font-size: 0.78rem;
+    color: var(--text-hint);
+    margin-top: 1px;
+  }
+
+  /* Fields */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.875rem;
+  }
+  .field-row.thirds {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .field-row.full {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 520px) {
+    .field-row, .field-row.thirds { grid-template-columns: 1fr; }
+  }
+
+  .field {
+    margin-bottom: 0.875rem;
+  }
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.01em;
+  }
+  label .req {
+    color: var(--error);
+    margin-left: 2px;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: #FAFBFD;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(47,84,150,0.1);
+  }
+  input.error, select.error, textarea.error {
+    border-color: var(--error);
+    background: var(--error-bg);
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem; }
+  .field-hint { font-size: 0.73rem; color: var(--text-hint); margin-top: 0.25rem; }
+  .field-error { font-size: 0.73rem; color: var(--error); margin-top: 0.25rem; display: none; }
+  .field-error.show { display: block; }
+
+  /* Member entry cards */
+  .member-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .member-card {
+    background: #F7F9FC;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius);
+    padding: 1rem 1rem 0.75rem;
+    position: relative;
+  }
+  .member-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .member-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .btn-remove {
+    background: none;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--radius);
+    padding: 3px 10px;
+    font-size: 0.73rem;
+    color: var(--error);
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-remove:hover { background: var(--error-bg); border-color: var(--error); }
+
+  .btn-add {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 0.55rem 1rem;
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .btn-add:hover { border-color: var(--navy-mid); color: var(--navy-mid); background: var(--navy-light); }
+  .btn-add svg { width: 16px; height: 16px; stroke: currentColor; }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: #EDF2F7;
+    margin: 0.5rem 0 1rem;
+  }
+
+  /* Submit area */
+  .submit-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .consent-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+  .consent-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--navy);
+    cursor: pointer;
+  }
+  .consent-row label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    background: var(--navy);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Lora', serif;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-submit:hover { background: #162d54; }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { background: #A0AEC0; cursor: not-allowed; }
+  .btn-submit svg { width: 18px; height: 18px; stroke: currentColor; }
+
+  /* Success state */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .success-screen.show { display: block; }
+  .success-circle {
+    width: 72px; height: 72px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem;
+  }
+  .success-circle svg { width: 36px; height: 36px; stroke: var(--green); }
+  .success-screen h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.35rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .success-screen p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+  .success-ref {
+    display: inline-block;
+    background: var(--green-light);
+    border: 1px solid #9AE6B4;
+    border-radius: var(--radius);
+    padding: 0.4rem 1rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--green);
+    margin: 1rem 0;
+    letter-spacing: 0.04em;
+  }
+
+  /* Footer */
+  .form-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-hint);
+    margin-top: 2rem;
+    line-height: 1.6;
+  }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-accent"></div>
+  <div class="header-inner">
+    <div class="header-emblem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1F3864" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Green Ridge District Fellowship</h1>
+      <p>Family Registration Form &mdash; 2026 Membership Year</p>
+      <span class="header-badge">One form per family</span>
+    </div>
+  </div>
+</header>
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+
+<main>
+
+  <div class="notice">
+    Please fill in the details for your entire household. Submit one form per family. All fields marked <strong>*</strong> are required. Contact your district elder if you need assistance.
+  </div>
+
+  <form id="registrationForm" novalidate>
+
+    <!-- Section 1: Head of Family -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon navy">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Head of family</h2>
+          <p>Primary contact person for this registration</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="hof_first">First name <span class="req">*</span></label>
+          <input type="text" id="hof_first" name="hof_first" placeholder="e.g. James" autocomplete="given-name" required>
+          <div class="field-error" id="err_hof_first">Please enter a first name</div>
+        </div>
+        <div class="field">
+          <label for="hof_last">Last name <span class="req">*</span></label>
+          <input type="text" id="hof_last" name="hof_last" placeholder="e.g. Mwangi" autocomplete="family-name" required>
+          <div class="field-error" id="err_hof_last">Please enter a last name</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="hof_role">Role in family <span class="req">*</span></label>
+          <select id="hof_role" name="hof_role" required>
+            <option value="">Select role</option>
+            <option>Husband / Father</option>
+            <option>Wife / Mother</option>
+            <option>Single parent</option>
+            <option>Guardian</option>
+            <option>Other</option>
+          </select>
+          <div class="field-error" id="err_hof_role">Please select a role</div>
+        </div>
+        <div class="field">
+          <label for="hof_id">National ID / Passport No.</label>
+          <input type="text" id="hof_id" name="hof_id" placeholder="Optional">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Spouse -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon navy">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Spouse / co-parent</h2>
+          <p>Leave blank if not applicable</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="sp_first">First name</label>
+          <input type="text" id="sp_first" name="sp_first" placeholder="e.g. Grace" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="sp_last">Last name</label>
+          <input type="text" id="sp_last" name="sp_last" placeholder="e.g. Mwangi" autocomplete="off">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="sp_phone">Phone number</label>
+          <input type="tel" id="sp_phone" name="sp_phone" placeholder="e.g. 0712 345 678">
+        </div>
+        <div class="field">
+          <label for="sp_email">Email address</label>
+          <input type="email" id="sp_email" name="sp_email" placeholder="e.g. grace@email.com">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Other Adults -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon navy">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Other adults in the household</h2>
+          <p>Parents, siblings, relatives aged 18 and above</p>
+        </div>
+      </div>
+
+      <div class="member-list" id="adultList"></div>
+      <button type="button" class="btn-add" onclick="addMember('adult')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add another adult
+      </button>
+    </div>
+
+    <!-- Section 4: Children -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Children</h2>
+          <p>All children and youth under 18 years</p>
+        </div>
+      </div>
+
+      <div class="member-list" id="childList"></div>
+      <button type="button" class="btn-add" onclick="addMember('child')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add a child
+      </button>
+    </div>
+
+    <!-- Section 5: Contact Details -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.55-.55a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Contact details</h2>
+          <p>Primary contact for the family</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="phone_primary">Primary phone <span class="req">*</span></label>
+          <input type="tel" id="phone_primary" name="phone_primary" placeholder="e.g. 0712 345 678" required>
+          <div class="field-error" id="err_phone_primary">Please enter a phone number</div>
+        </div>
+        <div class="field">
+          <label for="phone_alt">Alternative phone</label>
+          <input type="tel" id="phone_alt" name="phone_alt" placeholder="e.g. 0733 456 789">
+        </div>
+      </div>
+
+      <div class="field-row full">
+        <div class="field">
+          <label for="email_primary">Email address</label>
+          <input type="email" id="email_primary" name="email_primary" placeholder="e.g. family@gmail.com">
+          <div class="field-hint">Used for fellowship updates and newsletters</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-header" style="margin-bottom:1rem; padding-bottom:0.5rem;">
+        <div class="section-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Home address</h2>
+          <p>Where the family resides</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="addr_estate">Estate / Village <span class="req">*</span></label>
+          <input type="text" id="addr_estate" name="addr_estate" placeholder="e.g. Greenridge Estate" required>
+          <div class="field-error" id="err_addr_estate">Please enter your estate or village</div>
+        </div>
+        <div class="field">
+          <label for="addr_road">Road / Street</label>
+          <input type="text" id="addr_road" name="addr_road" placeholder="e.g. Thika Road">
+        </div>
+      </div>
+
+      <div class="field-row thirds">
+        <div class="field">
+          <label for="addr_town">Town / Suburb <span class="req">*</span></label>
+          <input type="text" id="addr_town" name="addr_town" placeholder="e.g. Ruiru" required>
+          <div class="field-error" id="err_addr_town">Please enter your town</div>
+        </div>
+        <div class="field">
+          <label for="addr_county">County</label>
+          <input type="text" id="addr_county" name="addr_county" placeholder="e.g. Kiambu">
+        </div>
+        <div class="field">
+          <label for="addr_postcode">Post code / Box</label>
+          <input type="text" id="addr_postcode" name="addr_postcode" placeholder="e.g. P.O. Box 1234">
+        </div>
+      </div>
+
+      <div class="field-row full">
+        <div class="field">
+          <label for="addr_landmark">Nearest landmark</label>
+          <input type="text" id="addr_landmark" name="addr_landmark" placeholder="e.g. Near Ruiru Stadium, opposite the market">
+          <div class="field-hint">Helps elders and visitors locate your home</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Additional info -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon navy">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Additional information</h2>
+          <p>Anything else you'd like the district to know</p>
+        </div>
+      </div>
+
+      <div class="field-row full">
+        <div class="field">
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" placeholder="Special needs, prayer requests, ministries served, skills offered to the fellowship…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-area">
+      <div class="consent-row">
+        <input type="checkbox" id="consent" name="consent">
+        <label for="consent">I confirm that the information provided is accurate and I consent to it being held by Green Ridge District Fellowship for fellowship administration purposes.</label>
+      </div>
+      <button type="submit" class="btn-submit" id="submitBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="submitText">Submit family registration</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Success -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Registration complete!</h2>
+    <p>Thank you. Your family's details have been recorded for the Green Ridge District Fellowship 2026 membership year.</p>
+    <div class="success-ref" id="refCode"></div>
+    <p>Please keep your reference number safe. Contact your district elder if you need to make any corrections.</p>
+  </div>
+
+  <div class="form-footer">
+    Green Ridge District Fellowship &mdash; 2026 &nbsp;|&nbsp; For assistance contact your district elder<br>
+    This form is intended for registered district members only
+  </div>
+
+</main>
+
+<script>
+  let adultCount = 0;
+  let childCount = 0;
+
+  function addMember(type) {
+    const list = document.getElementById(type === 'adult' ? 'adultList' : 'childList');
+    const count = type === 'adult' ? ++adultCount : ++childCount;
+    const id = type + count;
+    const label = type === 'adult' ? 'Adult ' + count : 'Child ' + count;
+
+    const card = document.createElement('div');
+    card.className = 'member-card';
+    card.id = 'card_' + id;
+
+    if (type === 'adult') {
+      card.innerHTML = `
+        <div class="member-card-header">
+          <span class="member-label">${label}</span>
+          <button type="button" class="btn-remove" onclick="removeMember('card_${id}', 'adult')">Remove</button>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" name="adult_first_${count}" placeholder="First name">
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" name="adult_last_${count}" placeholder="Last name">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Relationship to head of family</label>
+            <select name="adult_rel_${count}">
+              <option value="">Select</option>
+              <option>Parent / Parent-in-law</option>
+              <option>Sibling / Sibling-in-law</option>
+              <option>Adult child</option>
+              <option>Relative</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Phone number</label>
+            <input type="tel" name="adult_phone_${count}" placeholder="e.g. 0712 345 678">
+          </div>
+        </div>`;
+    } else {
+      card.innerHTML = `
+        <div class="member-card-header">
+          <span class="member-label">${label}</span>
+          <button type="button" class="btn-remove" onclick="removeMember('card_${id}', 'child')">Remove</button>
+        </div>
+        <div class="field-row thirds">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" name="child_first_${count}" placeholder="First name">
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" name="child_last_${count}" placeholder="Last name">
+          </div>
+          <div class="field">
+            <label>Age (years)</label>
+            <input type="number" name="child_age_${count}" placeholder="e.g. 8" min="0" max="17">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>School (if applicable)</label>
+            <input type="text" name="child_school_${count}" placeholder="e.g. Ruiru Primary School">
+          </div>
+          <div class="field">
+            <label>Class / Form</label>
+            <input type="text" name="child_class_${count}" placeholder="e.g. Grade 5">
+          </div>
+        </div>`;
+    }
+    list.appendChild(card);
+    updateProgress();
+  }
+
+  function removeMember(cardId) {
+    const card = document.getElementById(cardId);
+    if (card) card.remove();
+    updateProgress();
+  }
+
+  document.getElementById('consent').addEventListener('change', function() {
+    document.getElementById('submitBtn').disabled = !this.checked;
+  });
+
+  function updateProgress() {
+    const required = ['hof_first','hof_last','hof_role','phone_primary','addr_estate','addr_town'];
+    let filled = required.filter(id => document.getElementById(id)?.value.trim()).length;
+    const pct = Math.round((filled / required.length) * 90);
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', updateProgress);
+  });
+
+  function validate() {
+    const required = [
+      { id: 'hof_first', err: 'err_hof_first' },
+      { id: 'hof_last', err: 'err_hof_last' },
+      { id: 'hof_role', err: 'err_hof_role' },
+      { id: 'phone_primary', err: 'err_phone_primary' },
+      { id: 'addr_estate', err: 'err_addr_estate' },
+      { id: 'addr_town', err: 'err_addr_town' },
+    ];
+    let valid = true;
+    required.forEach(({ id, err }) => {
+      const el = document.getElementById(id);
+      const errEl = document.getElementById(err);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        errEl.classList.add('show');
+        valid = false;
+      } else {
+        el.classList.remove('error');
+        errEl.classList.remove('show');
+      }
+    });
+    return valid;
+  }
+
+  document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!validate()) {
+      document.querySelector('.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const btn = document.getElementById('submitBtn');
+    const text = document.getElementById('submitText');
+    const spinner = document.getElementById('spinner');
+    btn.disabled = true;
+    text.textContent = 'Submitting…';
+    spinner.style.display = 'block';
+
+    const SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+    const formData = new FormData(document.getElementById('registrationForm'));
+    const ref = 'GRD-' + new Date().getFullYear() + '-' +
+                Math.random().toString(36).substring(2,7).toUpperCase();
+
+    const adults = [];
+    document.querySelectorAll('[name^="adult_first_"]').forEach((el, i) => {
+      const n = i + 1;
+      const first = el.value.trim();
+      const last = document.querySelector(`[name="adult_last_${n}"]`)?.value.trim();
+      const phone = document.querySelector(`[name="adult_phone_${n}"]`)?.value.trim();
+      const rel = document.querySelector(`[name="adult_rel_${n}"]`)?.value.trim();
+      if (first) adults.push(`${first} ${last} (${rel}) - ${phone}`);
+    });
+
+    const children = [];
+    document.querySelectorAll('[name^="child_first_"]').forEach((el, i) => {
+      const n = i + 1;
+      const first = el.value.trim();
+      const last = document.querySelector(`[name="child_last_${n}"]`)?.value.trim();
+      const age = document.querySelector(`[name="child_age_${n}"]`)?.value.trim();
+      const school = document.querySelector(`[name="child_school_${n}"]`)?.value.trim();
+      if (first) children.push(`${first} ${last}, Age ${age}, ${school}`);
+    });
+
+    const payload = {
+      timestamp:     new Date().toLocaleString('en-KE'),
+      ref,
+      hof_first:     formData.get('hof_first'),
+      hof_last:      formData.get('hof_last'),
+      hof_role:      formData.get('hof_role'),
+      phone_primary: formData.get('phone_primary'),
+      phone_alt:     formData.get('phone_alt'),
+      email_primary: formData.get('email_primary'),
+      addr_estate:   formData.get('addr_estate'),
+      addr_road:     formData.get('addr_road'),
+      addr_town:     formData.get('addr_town'),
+      addr_county:   formData.get('addr_county'),
+      addr_postcode: formData.get('addr_postcode'),
+      addr_landmark: formData.get('addr_landmark'),
+      spouse:        `${formData.get('sp_first')} ${formData.get('sp_last')}`.trim(),
+      spouse_phone:  formData.get('sp_phone'),
+      other_adults:  adults.join(' | '),
+      children:      children.join(' | '),
+      notes:         formData.get('notes')
+    };
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      document.getElementById('refCode').textContent = 'Reference: ' + ref;
+      document.getElementById('registrationForm').style.display = 'none';
+      document.querySelector('.notice').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
+      document.getElementById('progressBar').style.width = '100%';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(() => {
+      btn.disabled = false;
+      text.textContent = 'Submit family registration';
+      spinner.style.display = 'none';
+      alert('Submission failed. Please check your connection and try again.');
+    });
+  });
+</script>
+</body>
+</html>
